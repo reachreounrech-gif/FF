@@ -1,0 +1,17 @@
+game.Players.PlayerAdded:Connect(function(player)
+	player.CharacterAdded:Connect(function(character)
+ local shield = Instance.new("ForceField")
+		shield.Visible = true
+		shield.Parent = character
+  character.AncestryChanged:Connect(function(_, parent)
+			if not parent then
+				task.wait(1)
+				if player.Character then
+					local newShield = Instance.new("ForceField")
+					newShield.Visible = true
+					newShield.Parent = player.Character
+				end
+			end
+		end)
+	end)
+end)
