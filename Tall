@@ -1,0 +1,42 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local TARGET_HEIGHT_SCALE = 1.8
+
+local function makeCharacterTall(character, scale)
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    local success, err = pcall(function()
+        local hd = Players:GetHumanoidDescriptionFromUserId(player.UserId)
+        if hd then
+            if hd.HeightScale ~= nil then
+                hd.HeightScale = scale
+            elseif hd.BodyHeightScale ~= nil then
+                hd.BodyHeightScale = scale
+            elseif hd.BodyTypeScale ~= nil then
+                hd.BodyTypeScale = math.clamp(hd.BodyTypeScale * scale, 0.1, 5)
+            end
+            humanoid:ApplyDescription(hd)
+        end
+    end)
+
+    if not success then
+        if humanoid and humanoid.HipHeight then
+            humanoid.HipHeight = humanoid.HipHeight * scale
+        end
+
+        for _, part in ipairs(character:GetChildren()) do
+            if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                part.Size = part.Size * Vector3.new(1, scale, 1)
+            end
+        end
+    end
+end
+
+player.CharacterAdded:Connect(function(char)
+    makeCharacterTall(char, TARGET_HEIGHT_SCALE)
+end)
+
+if player.Character then
+    makeCharacterTall(player.Character, TARGET_HEIGHT_SCALE)
+end
